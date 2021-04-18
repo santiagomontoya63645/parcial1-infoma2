@@ -1,65 +1,58 @@
-int CLOCK_1 = 5;
-int LATCH_1 = 6;
-int DATA_1 = 7;
+/*
+SER ---> Entrada serial
+RLCK ---> Reloj de registro de salida
+SRCLK ---> Reloj de registro de desplazamiento
+*/
+const int SRCLK_1 = 5;
+const int RLCK_1 = 6;
+const int SER_1 = 7;
 
-int CLOCK_2 = 2;
-int LATCH_2 = 3;
-int DATA_2 = 4;
+const int SRCLK_2 = 2;
+const int RLCK_2 = 3;
+const int SER_2 = 4;
 
+char ingresado[30];
+int posicion=0;
 
-const byte numeros[8] = 
+void verificacion()
 {
-  0b00000001,
-  0b00000010,
-  0b00000100,
-  0b00001000,
-  0b00010000,
-  0b00100000,
-  0b01000000,
-  0b10000000,
-};
+  for(int i=0;i<8;i++){
+    digitalWrite(7,1);
 
-const byte numeros_2[8] = 
+  	digitalWrite(5,0);
+  	digitalWrite(5,1);
+  	digitalWrite(5,0);
+  
+  	digitalWrite(6,0);
+  	digitalWrite(6,1);
+  	digitalWrite(6,0);
+  }
+}
+
+void setup()
 {
-  0b11111110,
-  0b11111101,
-  0b11111011,
-  0b11110111,
-  0b11101111,
-  0b11011111,
-  0b10111111,
-  0b01111111
-};
-
-void setup() 
-{
-  pinMode(LATCH_1, OUTPUT);
-  pinMode(CLOCK_1, OUTPUT);
-  pinMode(DATA_1, OUTPUT);
-
-  pinMode(LATCH_2, OUTPUT);
-  pinMode(CLOCK_2, OUTPUT);
-  pinMode(DATA_2, OUTPUT);
-
+  // Configuración de los puertos seriales
+  for(int i=2;i<=7;i++){
+    pinMode(i,OUTPUT);
+    digitalWrite(i,0);
+  }
+  Serial.begin(9600);
+  Serial.println("Escriba 'test' si desea realizar la verificacion de los LED");
 }
 
 void loop()
 {
-  
-  for (int i = 0; i < 8; i++)
-  {
-     digitalWrite(LATCH_2, LOW);
-     shiftOut(DATA_2, CLOCK_2, LSBFIRST, numeros_2[i]);
-     digitalWrite(LATCH_2, HIGH);
-   
-    for (int j = 0; j <8; j++)
+  if (Serial.available()){
+    while(Serial.available()>0) 
     {
-      
-      digitalWrite(LATCH_1, LOW);
-      shiftOut(DATA_1, CLOCK_1, LSBFIRST, numeros[j]);
-      digitalWrite(LATCH_1, HIGH);
-      delay(100);
+      delay(5);
+      ingresado[posicion]=Serial.read();
+      posicion++;
+    }
+    Serial.print("Ingresado: ");
+  	Serial.println(ingresado);
+    if(ingresado[0]==116 && ingresado[1]==101 && ingresado[2]==115 && ingresado[3]==116){
+      verificacion();
     }
   }
-
 }
