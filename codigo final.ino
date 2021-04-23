@@ -158,16 +158,19 @@ void loop(){
   
   delete [] aux;
   
-  Serial.println("Ingrese tiempo entre patrones: ");
-  ingreso(aux);
-  *ptrt=atof(aux);
-  Serial.print("Tiempo entre patrones :");
-  Serial.println(tiempo);
-
-  delete [] aux;
+  if(patrones!=1){
+    Serial.println("Ingrese tiempo entre patrones: ");
+    ingreso(aux);
+    *ptrt=atof(aux);
+    Serial.print("Tiempo entre patrones :");
+    Serial.println(tiempo);
+    delete [] aux;
+  }
   
   Serial.println("A continuacion, ingrese sus patrones." );
   publik(patrones,tiempo);
   
   Serial.println("El patron ya ha sido mostrado, si desea volver a ingresar datos, empiece nuevamente por el # de patrones.");
 }
+	
+	
