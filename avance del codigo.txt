@@ -1,0 +1,172 @@
+[17:42, 22/4/2021] Pablooo: /*
+pinData ---> Entrada serial
+pinLatch ---> Reloj de registro de salida
+pinClock ---> Reloj de registro de desplazamiento
+*/
+
+int pinData  = 2;
+int pinLatch = 3;
+int pinClock = 4;
+
+void verificacion(){
+   shiftOut(pinData, pinClock, LSBFIRST, 255);
+   shiftOut(pinData, pinClock, LSBFIRST, 255);
+   shiftOut(pinData, pinClock, LSBFIRST, 255);
+   shiftOut(pinData, pinClock, LSBFIRST, 255);
+   shiftOut(pinData, pinClock, LSBFIRST, 255);
+   shiftOut(pinData, pinClock, LSBFIRST, 255);
+   shiftOut(pinData, pinClock, LSBFIRST, 255);
+   shiftOut(pinData, pinClock, LSBFIRST, 255);
+   digitalWrite(pinLatch, HIGH);
+   digitalWrite(pinLatch, LOW);
+}
+void imagen(int aled,int bled,int cled,int dled,int eled,int fled,int gled,int hled){
+  
+   shiftOut(pinData, pinClock, LS…
+[18:53, 22/4/2021] Pablooo: /*
+pinData ---> Entrada serial
+pinLatch ---> Reloj de registro de salida
+pinClock ---> Reloj de registro de desplazamiento
+*/
+
+int pinData  = 2;
+int pinLatch = 3;
+int pinClock = 4;
+
+void verificacion(){
+   shiftOut(pinData, pinClock, LSBFIRST, 255);
+   shiftOut(pinData, pinClock, LSBFIRST, 255);
+   shiftOut(pinData, pinClock, LSBFIRST, 255);
+   shiftOut(pinData, pinClock, LSBFIRST, 255);
+   shiftOut(pinData, pinClock, LSBFIRST, 255);
+   shiftOut(pinData, pinClock, LSBFIRST, 255);
+   shiftOut(pinData, pinClock, LSBFIRST, 255);
+   shiftOut(pinData, pinClock, LSBFIRST, 255);
+   digitalWrite(pinLatch, HIGH);
+   digitalWrite(pinLatch, LOW);
+}
+void imagen(int aled,int bled,int cled,int dled,int eled,int fled,int gled,int hled){
+  
+   shiftOut(pinData, pinClock, LSBFIRST, hled);
+   shiftOut(pinData, pinClock, LSBFIRST, gled);
+   shiftOut(pinData, pinClock, LSBFIRST, fled);
+   shiftOut(pinData, pinClock, LSBFIRST, eled);
+   shiftOut(pinData, pinClock, LSBFIRST, dled);
+   shiftOut(pinData, pinClock, LSBFIRST, cled);
+   shiftOut(pinData, pinClock, LSBFIRST, bled);
+   shiftOut(pinData, pinClock, LSBFIRST, aled);
+   digitalWrite(pinLatch, HIGH);
+   digitalWrite(pinLatch, LOW);
+}
+
+void ingreso(char ing[8]){
+  int verif=0,posicion=0;
+  Serial.println("Ingrese el dato: ");
+  while (true){
+    if (Serial.available()){
+    	posicion=0;
+    	while(Serial.available()>0) 
+    	{
+     	 delay(50);
+ 	     ing[posicion]=Serial.read();
+     	 posicion++; 
+    	}
+      	Serial.print("Ingresado: ");
+  	  	Serial.println(ing);
+      	if(ing[0]==116 && ing[1]==101 && ing[2]==115 && ing[3]==116){
+      		verificacion();
+      		//Se limpia el contenido del arreglo
+      		for(int i=0;i<=posicion;i++){
+      		  ing[i]=NULL;
+      		}
+    	}
+    	else{
+    	    break;
+ 	    }
+    }
+  }
+}
+
+int BinToInt (char ing[8]){
+  
+  int i = 0;  //Variable para el contador
+  int n = 0;  //Variable para calcular el resultado
+
+  while ( ing[i] == '0' || ing[i] == '1' ) {
+    if ( ing[i] == '0' )
+      n <<= 1;
+    else {
+      n ^= 1;
+      n <<= 1;
+    }
+  ++i;
+  } 
+  n >>= 1;
+  
+  //Serial.print("Prueba: ");
+  //Serial.println(n);
+
+  return(n);
+
+}
+
+void publik(int patrones, int tiempo){
+  int cantidad=0;
+  char patron[9]={};
+  int patronA;
+  cantidad=(patrones*8)-1;
+  int array[cantidad];
+  
+  int aux=0;
+  
+  for(int i=0;i<patrones*8;i++){
+    ingreso(patron);
+  	//Serial.print("PATRON: ");
+  	//Serial.println(patron);
+    patronA=BinToInt(patron);
+ 	//Serial.println(patronA);
+    array[aux]=patronA;
+    aux=aux+1;
+    if((i+1)%8==0){Serial.println("Ya ingresaste un patron.");}
+  }
+  for(int k=0;k<(patrones*8)-1;k=k+8){
+    imagen(array[k],array[k+1],array[k+2],array[k+3],array[k+4],array[k+5],array[k+6],array[k+7]);
+    delay(tiempo*1000);
+  }
+}
+
+void setup(){
+   pinMode(pinData, OUTPUT);
+   pinMode(pinLatch, OUTPUT);
+   pinMode(pinClock, OUTPUT);
+   
+   digitalWrite(pinData, 0);
+   digitalWrite(pinLatch, 0);
+   digitalWrite(pinClock, 0);
+  
+   Serial.begin(9600);
+   Serial.println("Escriba 'test' si desea realizar la verificacion de los LED");
+   Serial.println("Ingrese tiempo entre patrones en segundos: ");
+}
+
+void loop(){
+  char aux1[5]={};
+  char aux2[5]={};
+  
+  int patrones=0;
+  int tiempo=0;
+  
+  ingreso(aux1);
+  patrones=atoi(aux1);
+  Serial.print("Cantidad de patrones: ");
+  Serial.println(patrones);
+  
+  ingreso(aux2);
+  tiempo=atoi(aux2);
+  Serial.print("Tiempo entre patrones :");
+  Serial.println(tiempo);
+
+  publik(patrones,tiempo);
+  
+  Serial.println("Los patrones ya han sido mostrados, si desea volver a ingresar datos, empiece nuevamente por el # de patrones.");
+}
